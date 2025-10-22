@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://Sanduni-P.github.io/IntroPython-Bio/index.html</loc>
-    <lastmod>2025-09-18T08:01:24.107Z</lastmod>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/index.html</loc>
+    <lastmod>2025-10-22T01:43:38.305Z</lastmod>
+  </url>
+  <url>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/vignettes/3_Loading_Data.html</loc>
+    <lastmod>2025-10-22T01:39:13.941Z</lastmod>
+  </url>
+  <url>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/vignettes/1_Introduction.html</loc>
+    <lastmod>2025-10-22T01:39:13.940Z</lastmod>
+  </url>
+  <url>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/vignettes/reference.html</loc>
+    <lastmod>2025-10-21T03:31:34.336Z</lastmod>
+  </url>
+  <url>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/vignettes/4_Analysing_Data.html</loc>
+    <lastmod>2025-10-22T01:39:13.942Z</lastmod>
+  </url>
+  <url>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/vignettes/2_Intro_Python.html</loc>
+    <lastmod>2025-10-22T01:39:13.941Z</lastmod>
+  </url>
+  <url>
+    <loc>https://PMacDaSci.github.io/IntroPython-Bio/vignettes/5_Visualising_Data.html</loc>
+    <lastmod>2025-10-22T01:39:13.943Z</lastmod>
   </url>
 </urlset>

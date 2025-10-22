@@ -1,1 +1,1 @@
-Sitemap: https://Sanduni-P.github.io/IntroPython-Bio/sitemap.xml
+Sitemap: https://PMacDaSci.github.io/IntroPython-Bio/sitemap.xml
