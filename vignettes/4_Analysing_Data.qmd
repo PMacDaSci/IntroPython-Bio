@@ -290,7 +290,12 @@ For the same set of patients, you can check the minimum mutation count and ident
 
 ```{python}
 print('\nMinimum for Mutation_count column for cohort 1 patients:')
-print(metabric_patients.loc[cohort_mask, "Mutation_count"].min())
+min_mutation = metabric_patients.loc[cohort_mask, "Mutation_count"].min()
+print(min_mutation)
+
+print('Patients with minimum mutations:')
+min_mutation_mask = metabric_patients.loc[:, "Mutation_count"] == min_mutation
+metabric_patients.loc[min_mutation_mask & cohort_mask, :]
 ```
 
 
