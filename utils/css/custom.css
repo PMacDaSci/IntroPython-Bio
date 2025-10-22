@@ -60,3 +60,29 @@
   display: block;
   line-height: 1.4; /* avoid excess spacing inside */
 }
+
+/* Challenge callout styling */
+.challenge-callout .callout-header {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+  padding: 10px 10px !important;
+  font-weight: 600 !important;
+}
+
+.challenge-callout .callout-header .callout-title {
+  font-size: 1.2em !important;
+  margin: 0 !important;
+}
+
+/* Solution callout styling */
+.solution-callout .callout-header {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+  padding: 6px 10px !important;
+  font-weight: 500 !important;
+}
+
+.solution-callout .callout-body {
+  margin-top: 0 !important;
+  padding-top: 1rem !important;
+}

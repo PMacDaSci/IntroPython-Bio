@@ -15,7 +15,6 @@ env/
 *.h5
 
 # Ignore Quarto files
-*.qmd
 *.qmd.lock
 *.html
 
@@ -25,3 +24,11 @@ env/
 *.DS_Store
 
 /.quarto/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore Quarto directories
+.quarto/
+_site/
+docs

@@ -1,0 +1,551 @@
+---
+title: "Analysing Patient Data"
+teaching: 40
+exercises: 20
+questions:
+- How do I summarize and compare patient data in Python?
+objectives:
+- Describe data with simple summaries (average, median, spread, totals, and counts).
+- Choose whether to summarize across columns or across rows.
+- Filter the dataset using conditions and summarize just those rows.
+- Handle missing values so results are trustworthy.
+- Explore categories.
+keypoints:
+- Compute common summaries (mean, median, std, var, sum, count, value_counts).
+- Switch between column-wise and row-wise operations with `axis=` and use `numeric_only` for mixed dtypes.
+- Filter rows with boolean masks and summarize subsets.
+- Handle missing values with `dropna()` when appropriate.
+- Explore categories with `unique()`.
+---
+
+{{< include ../_includes/header.qmd >}}
+
+Words tell a story; statistics help us check whether that story fits the data. Once the Metabric data are loaded and labelled, the next step is to turn questions into short, reproducible operations: filter the rows you care about, pick the variables that answer the question, and apply the right summary or comparison.
+
+
+Before we can analyze patient data, we need to load it into Python in a way that makes it easy to work with. Let’s load the Metabric patient data and set the patient ID as the index, so rows are labelled meaningfully. If you already have `metabric_patients` in memory from a previous episode, you can reuse it; otherwise, run the following to (re)load it:
+
+```{python}
+import pandas as pd
+
+metabric_patients = pd.read_csv(
+    'https://zenodo.org/record/6450144/files/metabric_clinical_and_expression_data.csv',
+    index_col='Patient_ID'
+)
+```
+
+## Statistics on Data
+
+Before jumping into complex models, we start by describing the data. Descriptive statistics answer simple questions like “what is typical?” and “how much do values vary?” These summaries help you build intuition and spot problems early (e.g., unexpected scales or missing values).
+
+The pandas library provides a wide range of statistical functions and methods to compute summary statistics for your data. Below provides some of the key statistical measures you can compute using this library. 
+
+
+### Mean 
+
+Mean (*average*) of a single column (one variable):
+
+```{python}
+metabric_patients.loc[:, 'Survival_time'].mean()
+```
+
+This answers “on average, what is the value of this variable?” Here we use the `Survival_time` column.
+
+Mean of all numeric columns (column-wise):
+
+```{python}
+metabric_patients.mean(numeric_only = True)
+```
+
+This computes the mean for each numeric column independently, giving you a quick overview of typical values across the dataset.
+
+::: {.callout-note}
+## Why `numeric_only=True`?
+
+Many DataFrames mix numeric columns (like Tumour_size) with non-numeric columns (like Patient_ID or Cohort labels). Adding `numeric_only=True` tells pandas to ignore non-numeric columns when computing a statistic across the whole DataFrame. This avoids errors or confusing results. For a single numeric column (e.g., `metabric_patients.loc[:, 'Survival_time']`), you don’t need this argument; it’s most helpful for DataFrame-wide operations.
+:::
+
+Mean across each row:
+
+```{python}
+metabric_patients.mean(axis=1, numeric_only=True)
+```
+
+
+This treats each row as a small collection of values and averages across columns. It only makes sense when the columns you include are on a comparable scale (for example, a set of related measurements). The `axis=1` argument tells Pandas to compute across columns for each row.
+
+::: {.callout-note}
+## Understanding `axis=`
+
+- `axis=0` (default) means “by column”: compute one result per column across rows.
+- `axis=1` means “by row”: compute one result per row across columns.
+
+Most reducers (`sum`, `mean`, `min`, `max`, etc.) accept `axis=` and follow the same pattern.
+:::
+
+### Median
+
+The median (*robust "typical" value*) is the middle value when data are sorted. It is not affected by extreme values (outliers) and is often used to describe the central tendency of data. 
+
+```{python}
+metabric_patients.median(numeric_only = True)
+```
+
+Visualising mean vs median:
+
+```{python}
+#| echo: false
+#| fig-align: center
+import matplotlib.pyplot as plt
+
+# choose a numeric column to visualise
+vals = metabric_patients.loc[:, 'Tumour_size'].dropna()
+
+plt.figure(figsize=(6, 3.5))
+plt.hist(vals, bins=30, color='#8ecae6', edgecolor='white')
+plt.axvline(vals.mean(), color='#d62828', linestyle='--', linewidth=2, label='Mean')
+plt.axvline(vals.median(), color='#f77f00', linestyle='-', linewidth=2, label='Median')
+plt.title('Tumour size distribution')
+plt.xlabel('Tumour size (mm)')
+plt.ylabel('Count')
+plt.legend()
+plt.tight_layout()
+```
+
+The mean pulls toward extreme values more than the median. In skewed distributions, the two lines will sit apart.
+
+### Standard Deviation 
+
+The standard deviation (*spread around the mean*) measures the amount of variation or dispersion in a dataset. A lower standard deviation indicates that data points are close to the mean, while a higher standard deviation indicates greater variability. 
+
+```{python}
+metabric_patients.std(numeric_only = True)
+```
+
+### Variance 
+
+Variance (*spread in squared units*) is the square of the standard deviation. It quantifies how much individual data points deviate from the mean. It’s useful mathematically, but note its units are squared (e.g., cm² if the original variable is in cm). 
+
+```{python}
+metabric_patients.var(numeric_only = True)
+```
+
+### Sum 
+
+Use `.sum()` to add up values.
+
+Total for each numeric column (column-wise):
+
+```{python}
+metabric_patients.sum(numeric_only = True)
+```
+
+Total for a single column (e.g., Mutation_count across all patients):
+
+```{python}
+metabric_patients.loc[:, 'Mutation_count'].sum()
+```
+
+If you ever sum across rows (`axis=1`), be sure the columns are on comparable scales.
+
+Row-wise sum of selected numeric columns (use with care):
+
+```{python}
+metabric_patients.loc[:, 'ESR1':'MLPH'].sum(axis = 1, numeric_only = True)
+```
+
+What the output shows
+
+- DataFrame sum (no `axis=` given): a Series (one total per numeric column).
+- Single-column sum: a single number.
+- Row-wise sum (`axis=1`): a Series indexed by row labels (one total per patient).
+
+### Count 
+
+Use `.count()` to count non-missing values. This is helpful to see how complete each column is.
+
+Count of non-missing values for each column:
+
+```{python}
+metabric_patients.count()
+```
+
+This returns the counts or the number of entries excluding missing values for each column in the dataframe. 
+
+Count of non-missing values for a single column:
+
+```{python}
+metabric_patients.loc[:, 'Survival_status'].count()
+```
+
+This returns a single number - non-missing entries in the Survival_status column.
+
+Here is a quick reference summary table of common useful functions.
+
+```{=html}
+<table>
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="center"><code>count</code></td>
+      <td>Number of non-NA observations</td>
+    </tr>
+    <tr>
+      <td align="center"><code>sum</code></td>
+      <td>Sum of values</td>
+    </tr>
+    <tr>
+      <td align="center"><code>mean</code></td>
+      <td>Mean of values</td>
+    </tr>
+    <tr>
+      <td align="center"><code>median</code></td>
+      <td>Arithmetic median of values</td>
+    </tr>
+    <tr>
+      <td align="center"><code>min</code></td>
+      <td>Minimum</td>
+    </tr>
+    <tr>
+      <td align="center"><code>max</code></td>
+      <td>Maximum</td>
+    </tr>
+    <tr>
+      <td align="center"><code>mode</code></td>
+      <td>Mode</td>
+    </tr>
+    <tr>
+      <td align="center"><code>abs</code></td>
+      <td>Absolute Value</td>
+    </tr>
+    <tr>
+      <td align="center"><code>prod</code></td>
+      <td>Product of values</td>
+    </tr>
+    <tr>
+      <td align="center"><code>std</code></td>
+      <td>Bessel-corrected sample standard deviation</td>
+    </tr>
+    <tr>
+      <td align="center"><code>var</code></td>
+      <td>Unbiased variance</td>
+    </tr>
+    <tr>
+      <td align="center"><code>sem</code></td>
+      <td>Standard error of the mean</td>
+    </tr>
+    <tr>
+      <td align="center"><code>skew</code></td>
+      <td>Sample skewness (3rd moment)</td>
+    </tr>
+    <tr>
+      <td align="center"><code>kurt</code></td>
+      <td>Sample kurtosis (4th moment)</td>
+    </tr>
+    <tr>
+      <td align="center"><code>quantile</code></td>
+      <td>Sample quantile (value at %)</td>
+    </tr>
+    <tr>
+      <td align="center"><code>cumsum</code></td>
+      <td>Cumulative sum</td>
+    </tr>
+    <tr>
+      <td align="center"><code>cumprod</code></td>
+      <td>Cumulative product</td>
+    </tr>
+    <tr>
+      <td align="center"><code>cummax</code></td>
+      <td>Cumulative maximum</td>
+    </tr>
+    <tr>
+      <td align="center"><code>cummin</code></td>
+      <td>Cumulative minimum</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+In summary, descriptive statistics provide a powerful first look at your data, helping you understand its central tendencies, variability, and completeness. By using functions like `mean`, `median`, `std`, and `value_counts`, you can quickly identify patterns, spot anomalies, and prepare your dataset for deeper analysis. Mastering these basic tools in pandas will make your data exploration more efficient and insightful.
+
+Recall from the previous episode that you can select specific rows using boolean conditions (masks). See the section on [boolean masks](3_Loading_Data.qmd#boolean-masks). We’ll apply the above statistics to filtered subsets. All the statistical operators that work on entire DataFrames work the same way on slices.
+
+Below are a few examples showing how to compute min and max over columns and rows, and how to find which patient or column produced that value.
+
+Let's say we want to analyze patients from cohort 1, whose IDs range from MB-0000 to MB-0906. For example, to find the maximum tumour size among these patients, we can use the following code:
+
+```{python}
+cohort_mask = metabric_patients.loc[:, "Cohort"] == 1
+
+print('Maximum for Tumour_size column for cohort 1 patients:')
+print(metabric_patients.loc[cohort_mask, "Tumour_size"].max())
+```
+
+For the same set of patients, you can check the minimum mutation count and identify which patient has it. For example:
+
+```{python}
+print('\nMinimum for Mutation_count column for cohort 1 patients:')
+print(metabric_patients.loc[cohort_mask, "Mutation_count"].min())
+```
+
+
+::: {.callout-note .challenge-callout icon="false" style="border-left: 4px solid #ffc107;"}
+
+## Challenge: Summaries for Breast Invasive Ductal Carcinoma (IDC)
+
+Build a small workflow that focuses on a clinically defined subset and its gene expression profile.
+
+1. Create a boolean mask for patients whose `Cancer_type` is "Breast Invasive Ductal Carcinoma" (IDC).
+2. Using that mask, select only the expression columns for those patients. 
+3. Compute column-wise summaries across patients for the expression columns:
+    - Mean for each gene
+    - Median for each gene
+    
+4. Compute a left-to-right cumulative sum across the expression columns for each patient. In each row, the final expression column should equal the total (sum) across all genes for that patient.
+
+:::
+
+::: {.callout-tip collapse="true" icon="false"}
+
+## Hints
+- In this dataset the expression columns starts at the `ESR1` column and runs to the end of the table.
+- Use `.eq('Breast Invasive Ductal Carcinoma')` or `== 'Breast Invasive Ductal Carcinoma'` to build the mask.
+- Column-wise summaries are the default (`axis=0`), row-wise requires `axis=1`.
+
+:::
+
+
+::: {.callout-tip .solution-callout collapse="true" icon="false" style="border-left: 4px solid #ffc107;"}
+
+## Solution
+
+```{python}
+# 1) Mask for IDC patients
+cancer_type_mask = metabric_patients.loc[:, 'Cancer_type'] == 'Breast Invasive Ductal Carcinoma'
+```
+
+```{python}
+# 2) Expression-only slice for IDC patients (from ESR1 to end)
+expr_idc = metabric_patients.loc[cancer_type_mask, 'ESR1':]
+expr_idc
+```
+
+```{python}
+# 3) Column-wise summaries (one value per gene)
+expr_means = expr_idc.mean()      # axis=0 by default
+expr_means
+```
+
+```{python}
+expr_medians = expr_idc.median()  # axis=0 by default
+expr_medians
+```
+
+```{python}
+# 4) Row-wise cumulative sums (one row per patient, accumulating across genes)
+expr_cumsum_per_patient = expr_idc.cumsum(axis=1)
+```
+
+:::
+
+
+## Useful Helper Functions
+
+Before plotting or building more complex summaries, a few small helpers make your life easier. These tools don’t change the meaning of your data—they help you clean rows, control order, and ask focused questions. After each command, check what changed: the values, the order, the labels, or the row count.
+
+### Missing Values
+
+It’s important to make sure your data doesn’t contain missing values (represented as `NaN`, which stands for "Not a Number"). Missing values can cause errors or misleading results in your analysis. For example, calculating the mean of a column with missing values will return NaN, and plotting functions might skip or misrepresent those data points.
+
+To handle this, you can use the `dropna()` method. This method removes any rows (or columns) that contain missing values. By default, `dropna()` removes rows where any column has a missing value.
+
+Drop rows where either '3-gene_classifier' or 'GATA3' is missing:
+
+```{python}
+subset = metabric_patients.loc[:, ['3-gene_classifier', 'GATA3']].dropna()
+print('Rows before:', len(metabric_patients))
+print('Rows after dropna:', len(subset))
+```
+
+You’ll see the original row count and a smaller count after `dropna()` command. The `subset` DataFrame keeps only rows where both columns are present. By default, rows are dropped if any of the specified columns are missing. To drop columns instead of rows, use `axis=1`. To control which columns are checked, pass `subset=[...]` (as above).
+
+### Unique Values
+
+When you’re exploring categorical columns, a first sanity check is to list which labels actually appear. This helps you spot typos ("Lum a" vs "LumA"), unexpected categories, or missing values before you count or plot. Pandas provides `.unique()` for this: it returns the distinct values observed in a column.
+
+`unique()` returns an array of the distinct values. If the column contains missing values (`NaN`), they will be included in the result. Use `dropna()` first if you want to exclude missing values from the listing.
+
+```{python}
+metabric_patients.loc[:, '3-gene_classifier'].unique()
+```
+
+```{python}
+# Distinct labels, excluding missing entries
+metabric_patients.loc[:, '3-gene_classifier'].dropna().unique()
+```
+
+The order of the output is based on first appearance in the column; it’s not alphabetical. If you want you can sort the categories as follows: 
+
+```{python}
+labels = metabric_patients.loc[:, '3-gene_classifier'].dropna().unique()
+sorted_labels = sorted(labels)
+sorted_labels
+```
+
+Listing the set of categories is often followed by asking “how many of each?”. To get a frequency table see the Frequency of Values section below. 
+
+### Frequency of Values 
+
+To inspect how often each distinct value appears in a column, use `value_counts()`. This is particularly helpful for categorical variables (for example, labels) to check balance, spot rare categories, and reveal unexpected or missing labels. By default it returns counts sorted by frequency.
+
+```{python}
+metabric_patients.value_counts()
+```
+
+When you call `value_counts()` on an entire DataFrame, each index represents a unique combination of values across all columns, and the count shows how many rows share that exact combination. Since each row in our dataset is unique, all counts will be 1—this is a quick way to check for duplicate rows.
+
+For a specific column (e.g., `3-gene_classifier`):
+
+```{python}
+metabric_patients.loc[:, '3-gene_classifier'].value_counts()
+```
+
+When used on a single column, `value_counts()` returns a Series where the index lists each unique value (such as category names) and the corresponding values show how many times each occurs. In the example above, you’ll see four categories and their respective counts.
+
+Set `normalize=True` to display proportions (percentages) rather than raw counts.
+
+```{python}
+metabric_patients.loc[:, '3-gene_classifier'].value_counts(normalize=True)
+```
+
+To display percentages, multiply the result by 100:
+
+```{python}
+metabric_patients.loc[:, '3-gene_classifier'].value_counts(normalize=True) * 100
+```
+
+By default, missing values (or `NaN`) are excluded from the result. This means that only rows with actual, non-missing values are counted in the frequency table. If you want to include missing values as their own category in the output, you can pass the argument `dropna=False` to `value_counts()`. This will show how many times `NaN` appears in the column, which is useful for quickly assessing the amount of missing data in a categorical variable.
+
+```{python}
+metabric_patients.loc[:, '3-gene_classifier'].value_counts(dropna=False)
+```
+
+::: {.callout-tip}
+## Tip — Missing Categories
+
+Use `dropna=False` to see how many entries are missing. If your analysis should exclude missing rows entirely, clean first with `.dropna()` on the relevant columns (see the Missing Values section above) and then run `value_counts()`.
+:::
+
+Counts returned by `value_counts()` are automatically sorted from most to least frequent. If you want to sort the counts by the actual labels (in alphabetical order), you can use the `sort_index()` method. This is useful when you need to view your data categories in a predictable, ordered way rather than by their frequency.
+
+```{python}
+metabric_patients.loc[:, 'Integrative_cluster'].value_counts().sort_index()
+```
+
+To display categories in a custom order (such as a clinically meaningful sequence), use the `reindex()` method. This lets you specify the exact order of labels you want to see in your output, rather than relying on alphabetical or frequency-based sorting. For example, if you have a desired order of cluster labels, you can filter to only those present in your data and then reindex the counts:
+
+```{python}
+counts = metabric_patients.loc[:, 'Integrative_cluster'].value_counts()
+
+# custom order (keep only labels that exist)
+desired = ["1", "2", "3", "4ER-", "4ER+", "5", "6", "7", "8", "9", "10"]
+present = [lab for lab in desired if lab in counts.index]
+counts_custom = counts.reindex(present)
+counts_custom
+```
+
+This approach first uses `value_counts()` to tally each unique value in the Integrative_cluster column, producing a pandas Series with cluster labels as the index and their counts as values. The `desired` list defines the preferred order for these labels.
+
+The code then filters `desired` to include only labels that are actually present in the data. Using `reindex(present)` rearranges the counts Series to match this custom order, ensuring the output is organized as intended.
+
+If a label from `desired` is missing in the data, it is simply omitted from the result—no NaNs are introduced. This method is especially helpful for displaying or plotting results in a meaningful sequence.
+
+
+
+::: {.callout-note .challenge-callout icon="false" style="border-left: 4px solid #ffc107;"}
+
+## Challenge: Summarize Categories (Cellularity)
+
+1) List the unique labels in `Cellularity`:
+   - Excluding missing values
+   - Including missing values
+
+2) Show `Cellularity` label counts with:
+   - Raw counts (include and exclude missing values)
+   - Percentages 
+   - Alphabetical order 
+
+3) How many patients have High cellularity but no recorded 3-gene classifier? (i.e., missing value in 3-gene classifier column)
+
+:::
+
+
+::: {.callout-tip collapse="true" icon="false"}
+
+## Hints
+
+- To count rows, use `.shape[0]` or `len(...)`.
+- “No recorded 3-gene classifier” means missing values. 
+- Use `.shape[0]` to get number of rows.
+- Patients with high cellularity but no recorded 3-gene classifier = patients with high cellularity and all records in 3-gene classifier - patients with high cellularity and non missing values in 3-gene classifier.
+
+:::
+
+
+::: {.callout-tip .solution-callout collapse="true" icon="false" style="border-left: 4px solid #ffc107;"}
+
+## Solution
+
+```{python}
+# 1) Unique labels
+metabric_patients.loc[:, 'Cellularity'].unique()
+metabric_patients.loc[:, 'Cellularity'].dropna().unique()
+```
+
+```{python}
+# 2) Label counts
+metabric_patients.loc[:, 'Cellularity'].value_counts(dropna=False)
+metabric_patients.loc[:, 'Cellularity'].value_counts()
+metabric_patients.loc[:, 'Cellularity'].value_counts(normalize=True) * 100
+metabric_patients.loc[:, 'Cellularity'].value_counts().sort_index()
+```
+
+
+```{python}
+# 3) mask for high cellularity
+mask_cell = metabric_patients.loc[:, 'Cellularity'] == 'High'
+# no. of patients with high cellularity 
+n_cell = metabric_patients.loc[mask_cell, '3-gene_classifier'].shape[0]
+# no. of patients with high cellularity and non-missing values in 3-gene_classifier
+n_cell_3gene = metabric_patients.loc[mask_cell, '3-gene_classifier'].dropna().shape[0]
+# no. of patients with high cellularity and missing values in 3-gene_classifier
+n_cell - n_cell_3gene
+```
+
+```{python}
+# 3) Patients with High cellularity and NO recorded 3-gene classifier
+mask_cell_high = metabric_patients.loc[:, 'Cellularity'].eq('High')
+no_classifier_count = metabric_patients.loc[mask_cell_high, '3-gene_classifier'].isna().sum()
+no_classifier_count
+```
+:::
+
+{{< include ../_includes/footer.qmd >}}
+
+---
+<table style="width: 100%; border: none;">
+  <tr>
+    <td style="text-align: left; width: 50%;">
+        [← Previous](../vignettes/3_Loading_Data.qmd)
+    </td>
+    <td style="text-align: right; width: 50%;">
+      [Next →](../vignettes/5_Visualising_Data.qmd)
+    </td>
+  </tr>
+</table>
+
