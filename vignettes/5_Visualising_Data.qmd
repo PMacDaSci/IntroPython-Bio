@@ -386,7 +386,7 @@ plt.savefig("scatter_gata3_esr1.pdf")
 
 ::: {.callout-note .challenge-callout icon="false" style="border-left: 4px solid #ffc107;"}
 
-## Try It Yourself
+## Challenge: Scatter Plot
 
 Create a scatter plot of ESR1 expression vs Nottingham prognostic index as shown below and save is as a PDF. 
 
@@ -487,7 +487,7 @@ plt.tight_layout()
 
 ::: {.callout-note .challenge-callout icon="false" style="border-left: 4px solid #ffc107;"}
 
-## Try it yourself — Colourful bars with outlines
+## Challenge: Colourful bars with outlines
 
 Create a bar chart of patient counts by cancer type, then add a fill colour and a contrasting edge colour to make the bars stand out.
 
@@ -563,7 +563,7 @@ A list is a way to store multiple items together in a single variable. In Python
 
 ::: {.callout-note .challenge-callout icon="false" style="border-left: 4px solid #ffc107;"}
 
-## Try it yourself — Box plot by 3‑gene classifier
+## Challenge: Box plot by 3‑gene classifier
 
 Create a box plot of GATA3 expression across categories of the 3‑gene classifier. Required data is already given for you.
 
