@@ -5373,9 +5373,33 @@ dtype: int64</code></pre>
 <pre><code>
 Minimum for Mutation_count column for cohort 1 patients:</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(metabric_patients.loc[cohort_mask, <span class="st">&quot;Mutation_count&quot;</span>].<span class="bu">min</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>min_mutation <span class="op">=</span> metabric_patients.loc[cohort_mask, <span class="st">&quot;Mutation_count&quot;</span>].<span class="bu">min</span>()</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(min_mutation)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>1.0</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Patients with minimum mutations:&#39;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Patients with minimum mutations:</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>min_mutation_mask <span class="op">=</span> metabric_patients.loc[:, <span class="st">&quot;Mutation_count&quot;</span>] <span class="op">==</span> min_mutation</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[min_mutation_mask <span class="op">&amp;</span> cohort_mask, :]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            Cohort  Age_at_diagnosis  ...      FOXA1       MLPH
+Patient_ID                            ...                      
+MB-0006          1             47.68  ...  11.863379  10.472181
+MB-0022          1             89.08  ...  10.679403   9.945023
+MB-0036          1             85.49  ...  11.991655  12.466928
+MB-0100          1             68.68  ...   6.311955   7.963707
+MB-0124          1             43.46  ...  11.121980  12.157160
+...            ...               ...  ...        ...        ...
+MB-0663          1             57.76  ...  11.210480  12.008812
+MB-0666          1             61.31  ...  11.271216  11.532359
+MB-0880          1             73.64  ...  12.200512  12.800465
+MB-0882          1             73.39  ...  11.514192  12.707877
+MB-0895          1             79.61  ...  11.615925  10.906647
+
+[78 rows x 31 columns]</code></pre>
 </div>
 </div>
 <div class="challenge-callout callout callout-style-default callout-note no-icon callout-titled" style="border-left: 4px solid #ffc107;">
@@ -5434,13 +5458,13 @@ Solution
 <div id="callout-6" class="callout-6-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) Mask for IDC patients</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>cancer_type_mask <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Cancer_type&#39;</span>] <span class="op">==</span> <span class="st">&#39;Breast Invasive Ductal Carcinoma&#39;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) Mask for IDC patients</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>cancer_type_mask <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Cancer_type&#39;</span>] <span class="op">==</span> <span class="st">&#39;Breast Invasive Ductal Carcinoma&#39;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Expression-only slice for IDC patients (from ESR1 to end)</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>expr_idc <span class="op">=</span> metabric_patients.loc[cancer_type_mask, <span class="st">&#39;ESR1&#39;</span>:]</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>expr_idc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Expression-only slice for IDC patients (from ESR1 to end)</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>expr_idc <span class="op">=</span> metabric_patients.loc[cancer_type_mask, <span class="st">&#39;ESR1&#39;</span>:]</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>expr_idc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>                 ESR1      ERBB2       PGR  ...      GATA3      FOXA1       MLPH
 Patient_ID                                  ...                                 
@@ -5460,9 +5484,9 @@ MB-7299     10.696475  10.227787  5.533486  ...   9.749368  10.867527   9.847856
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Column-wise summaries (one value per gene)</span></span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>expr_means <span class="op">=</span> expr_idc.mean()      <span class="co"># axis=0 by default</span></span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>expr_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Column-wise summaries (one value per gene)</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>expr_means <span class="op">=</span> expr_idc.mean()      <span class="co"># axis=0 by default</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>expr_means</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ESR1       9.448306
 ERBB2     10.823817
@@ -5476,8 +5500,8 @@ dtype: float64</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>expr_medians <span class="op">=</span> expr_idc.median()  <span class="co"># axis=0 by default</span></span>
-<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>expr_medians</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>expr_medians <span class="op">=</span> expr_idc.median()  <span class="co"># axis=0 by default</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>expr_medians</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ESR1      10.148198
 ERBB2     10.549932
@@ -5491,8 +5515,8 @@ dtype: float64</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) Row-wise cumulative sums (one row per patient, accumulating across genes)</span></span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>expr_cumsum_per_patient <span class="op">=</span> expr_idc.cumsum(axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 4) Row-wise cumulative sums (one row per patient, accumulating across genes)</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>expr_cumsum_per_patient <span class="op">=</span> expr_idc.cumsum(axis<span class="op">=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
@@ -5508,12 +5532,12 @@ dtype: float64</code></pre>
 <p>To handle this, you can use the <code>dropna()</code> method. This method removes any rows (or columns) that contain missing values. By default, <code>dropna()</code> removes rows where any column has a missing value.</p>
 <p>Drop rows where either ‘3-gene_classifier’ or ‘GATA3’ is missing:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> metabric_patients.loc[:, [<span class="st">&#39;3-gene_classifier&#39;</span>, <span class="st">&#39;GATA3&#39;</span>]].dropna()</span>
-<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Rows before:&#39;</span>, <span class="bu">len</span>(metabric_patients))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>subset <span class="op">=</span> metabric_patients.loc[:, [<span class="st">&#39;3-gene_classifier&#39;</span>, <span class="st">&#39;GATA3&#39;</span>]].dropna()</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Rows before:&#39;</span>, <span class="bu">len</span>(metabric_patients))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows before: 1904</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Rows after dropna:&#39;</span>, <span class="bu">len</span>(subset))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Rows after dropna:&#39;</span>, <span class="bu">len</span>(subset))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows after dropna: 1700</code></pre>
 </div>
@@ -5525,15 +5549,15 @@ dtype: float64</code></pre>
 <p>When you’re exploring categorical columns, a first sanity check is to list which labels actually appear. This helps you spot typos (“Lum a” vs “LumA”), unexpected categories, or missing values before you count or plot. Pandas provides <code>.unique()</code> for this: it returns the distinct values observed in a column.</p>
 <p><code>unique()</code> returns an array of the distinct values. If the column contains missing values (<code>NaN</code>), they will be included in the result. Use <code>dropna()</code> first if you want to exclude missing values from the listing.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([&#39;ER-/HER2-&#39;, &#39;ER+/HER2- High Prolif&#39;, nan, &#39;ER+/HER2- Low Prolif&#39;,
        &#39;HER2+&#39;], dtype=object)</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Distinct labels, excluding missing entries</span></span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].dropna().unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Distinct labels, excluding missing entries</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].dropna().unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([&#39;ER-/HER2-&#39;, &#39;ER+/HER2- High Prolif&#39;, &#39;ER+/HER2- Low Prolif&#39;,
        &#39;HER2+&#39;], dtype=object)</code></pre>
@@ -5541,9 +5565,9 @@ dtype: float64</code></pre>
 </div>
 <p>The order of the output is based on first appearance in the column; it’s not alphabetical. If you want you can sort the categories as follows:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].dropna().unique()</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>sorted_labels <span class="op">=</span> <span class="bu">sorted</span>(labels)</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>sorted_labels</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].dropna().unique()</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>sorted_labels <span class="op">=</span> <span class="bu">sorted</span>(labels)</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>sorted_labels</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[&#39;ER+/HER2- High Prolif&#39;, &#39;ER+/HER2- Low Prolif&#39;, &#39;ER-/HER2-&#39;, &#39;HER2+&#39;]</code></pre>
 </div>
@@ -5554,7 +5578,7 @@ dtype: float64</code></pre>
 <h3 class="anchored" data-anchor-id="frequency-of-values">Frequency of Values</h3>
 <p>To inspect how often each distinct value appears in a column, use <code>value_counts()</code>. This is particularly helpful for categorical variables (for example, labels) to check balance, spot rare categories, and reveal unexpected or missing labels. By default it returns counts sorted by frequency.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cohort  Age_at_diagnosis  Survival_time  Survival_status  Vital_status          Chemotherapy  Radiotherapy  Tumour_size  Tumour_stage  Neoplasm_histologic_grade  Lymph_nodes_examined_positive  Lymph_node_status  Cancer_type                                ER_status  PR_status  HER2_status  HER2_status_measured_by_SNP6  PAM50  3-gene_classifier      Nottingham_prognostic_index  Cellularity  Integrative_cluster  Mutation_count  ESR1       ERBB2      PGR       TP53      PIK3CA    GATA3      FOXA1      MLPH     
 1       26.36             32.633333      DECEASED         Died of Disease       NO            YES           12.0         1.0           3.0                        0                              1                  Breast Invasive Ductal Carcinoma           Positive   Positive   Negative     NEUTRAL                       LumA   ER+/HER2- High Prolif  4.024                        High         6                    1.0             9.588608   9.490468   7.928097  6.356356  5.680179  9.411429   10.718919  10.956553    1
@@ -5574,7 +5598,7 @@ Name: count, Length: 1121, dtype: int64</code></pre>
 <p>When you call <code>value_counts()</code> on an entire DataFrame, each index represents a unique combination of values across all columns, and the count shows how many rows share that exact combination. Since each row in our dataset is unique, all counts will be 1—this is a quick way to check for duplicate rows.</p>
 <p>For a specific column (e.g., <code>3-gene_classifier</code>):</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>3-gene_classifier
 ER+/HER2- Low Prolif     619
@@ -5587,7 +5611,7 @@ Name: count, dtype: int64</code></pre>
 <p>When used on a single column, <code>value_counts()</code> returns a Series where the index lists each unique value (such as category names) and the corresponding values show how many times each occurs. In the example above, you’ll see four categories and their respective counts.</p>
 <p>Set <code>normalize=True</code> to display proportions (percentages) rather than raw counts.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>3-gene_classifier
 ER+/HER2- Low Prolif     0.364118
@@ -5599,7 +5623,7 @@ Name: proportion, dtype: float64</code></pre>
 </div>
 <p>To display percentages, multiply the result by 100:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>) <span class="op">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>) <span class="op">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>3-gene_classifier
 ER+/HER2- Low Prolif     36.411765
@@ -5611,7 +5635,7 @@ Name: proportion, dtype: float64</code></pre>
 </div>
 <p>By default, missing values (or <code>NaN</code>) are excluded from the result. This means that only rows with actual, non-missing values are counted in the frequency table. If you want to include missing values as their own category in the output, you can pass the argument <code>dropna=False</code> to <code>value_counts()</code>. This will show how many times <code>NaN</code> appears in the column, which is useful for quickly assessing the amount of missing data in a categorical variable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;3-gene_classifier&#39;</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>3-gene_classifier
 ER+/HER2- Low Prolif     619
@@ -5637,7 +5661,7 @@ Tip — Missing Categories
 </div>
 <p>Counts returned by <code>value_counts()</code> are automatically sorted from most to least frequent. If you want to sort the counts by the actual labels (in alphabetical order), you can use the <code>sort_index()</code> method. This is useful when you need to view your data categories in a predictable, ordered way rather than by their frequency.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Integrative_cluster&#39;</span>].value_counts().sort_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Integrative_cluster&#39;</span>].value_counts().sort_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Integrative_cluster
 1       132
@@ -5656,13 +5680,13 @@ Name: count, dtype: int64</code></pre>
 </div>
 <p>To display categories in a custom order (such as a clinically meaningful sequence), use the <code>reindex()</code> method. This lets you specify the exact order of labels you want to see in your output, rather than relying on alphabetical or frequency-based sorting. For example, if you have a desired order of cluster labels, you can filter to only those present in your data and then reindex the counts:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Integrative_cluster&#39;</span>].value_counts()</span>
-<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="co"># custom order (keep only labels that exist)</span></span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>desired <span class="op">=</span> [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4ER-&quot;</span>, <span class="st">&quot;4ER+&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>, <span class="st">&quot;10&quot;</span>]</span>
-<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>present <span class="op">=</span> [lab <span class="cf">for</span> lab <span class="kw">in</span> desired <span class="cf">if</span> lab <span class="kw">in</span> counts.index]</span>
-<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a>counts_custom <span class="op">=</span> counts.reindex(present)</span>
-<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a>counts_custom</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>counts <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Integrative_cluster&#39;</span>].value_counts()</span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb66-3"><a href="#cb66-3" aria-hidden="true" tabindex="-1"></a><span class="co"># custom order (keep only labels that exist)</span></span>
+<span id="cb66-4"><a href="#cb66-4" aria-hidden="true" tabindex="-1"></a>desired <span class="op">=</span> [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4ER-&quot;</span>, <span class="st">&quot;4ER+&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>, <span class="st">&quot;10&quot;</span>]</span>
+<span id="cb66-5"><a href="#cb66-5" aria-hidden="true" tabindex="-1"></a>present <span class="op">=</span> [lab <span class="cf">for</span> lab <span class="kw">in</span> desired <span class="cf">if</span> lab <span class="kw">in</span> counts.index]</span>
+<span id="cb66-6"><a href="#cb66-6" aria-hidden="true" tabindex="-1"></a>counts_custom <span class="op">=</span> counts.reindex(present)</span>
+<span id="cb66-7"><a href="#cb66-7" aria-hidden="true" tabindex="-1"></a>counts_custom</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Integrative_cluster
 1       132
@@ -5742,19 +5766,19 @@ Solution
 <div id="callout-10" class="callout-10-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) Unique labels</span></span>
-<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) Unique labels</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([nan, &#39;High&#39;, &#39;Moderate&#39;, &#39;Low&#39;], dtype=object)</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].dropna().unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].dropna().unique()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>array([&#39;High&#39;, &#39;Moderate&#39;, &#39;Low&#39;], dtype=object)</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Label counts</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Label counts</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts(dropna<span class="op">=</span><span class="va">False</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cellularity
 High        939
@@ -5763,7 +5787,7 @@ Low         200
 NaN          54
 Name: count, dtype: int64</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cellularity
 High        939
@@ -5771,7 +5795,7 @@ Moderate    711
 Low         200
 Name: count, dtype: int64</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>) <span class="op">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts(normalize<span class="op">=</span><span class="va">True</span>) <span class="op">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cellularity
 High        50.756757
@@ -5779,7 +5803,7 @@ Moderate    38.432432
 Low         10.810811
 Name: proportion, dtype: float64</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts().sort_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].value_counts().sort_index()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Cellularity
 High        939
@@ -5789,23 +5813,23 @@ Name: count, dtype: int64</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) mask for high cellularity</span></span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>mask_cell <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>] <span class="op">==</span> <span class="st">&#39;High&#39;</span></span>
-<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a><span class="co"># no. of patients with high cellularity </span></span>
-<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>n_cell <span class="op">=</span> metabric_patients.loc[mask_cell, <span class="st">&#39;3-gene_classifier&#39;</span>].shape[<span class="dv">0</span>]</span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a><span class="co"># no. of patients with high cellularity and non-missing values in 3-gene_classifier</span></span>
-<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>n_cell_3gene <span class="op">=</span> metabric_patients.loc[mask_cell, <span class="st">&#39;3-gene_classifier&#39;</span>].dropna().shape[<span class="dv">0</span>]</span>
-<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a><span class="co"># no. of patients with high cellularity and missing values in 3-gene_classifier</span></span>
-<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>n_cell <span class="op">-</span> n_cell_3gene</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) mask for high cellularity</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>mask_cell <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>] <span class="op">==</span> <span class="st">&#39;High&#39;</span></span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a><span class="co"># no. of patients with high cellularity </span></span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>n_cell <span class="op">=</span> metabric_patients.loc[mask_cell, <span class="st">&#39;3-gene_classifier&#39;</span>].shape[<span class="dv">0</span>]</span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a><span class="co"># no. of patients with high cellularity and non-missing values in 3-gene_classifier</span></span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>n_cell_3gene <span class="op">=</span> metabric_patients.loc[mask_cell, <span class="st">&#39;3-gene_classifier&#39;</span>].dropna().shape[<span class="dv">0</span>]</span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a><span class="co"># no. of patients with high cellularity and missing values in 3-gene_classifier</span></span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>n_cell <span class="op">-</span> n_cell_3gene</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>99</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Patients with High cellularity and NO recorded 3-gene classifier</span></span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>mask_cell_high <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].eq(<span class="st">&#39;High&#39;</span>)</span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>no_classifier_count <span class="op">=</span> metabric_patients.loc[mask_cell_high, <span class="st">&#39;3-gene_classifier&#39;</span>].isna().<span class="bu">sum</span>()</span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>no_classifier_count</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Patients with High cellularity and NO recorded 3-gene classifier</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>mask_cell_high <span class="op">=</span> metabric_patients.loc[:, <span class="st">&#39;Cellularity&#39;</span>].eq(<span class="st">&#39;High&#39;</span>)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>no_classifier_count <span class="op">=</span> metabric_patients.loc[mask_cell_high, <span class="st">&#39;3-gene_classifier&#39;</span>].isna().<span class="bu">sum</span>()</span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>no_classifier_count</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>np.int64(99)</code></pre>
 </div>
