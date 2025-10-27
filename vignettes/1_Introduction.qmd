@@ -424,9 +424,9 @@ Create a nested list in a Markdown cell in a notebook that looks like this:
 
 1. Get funding.
 2. Do work.
-  - Design experiment.
-  - Collect data.
-  - Analyze.
+    - Design experiment.
+    - Collect data.
+    - Analyze.
 3. Write up.
 4. Publish.
 

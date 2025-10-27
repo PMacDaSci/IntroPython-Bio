@@ -398,7 +398,7 @@ Create a scatter plot of ESR1 expression vs Nottingham prognostic index as shown
 
 ## Hints
 
-Use the "inferno" colormap, set marker size to 25, and transparency (alpha) to 0.6. Colour points by Nottingham prognostic index.*
+Use the "inferno" colormap, set marker size to 25, and transparency (alpha) to 0.6. Colour points by ESR1.*
 
 :::
 
